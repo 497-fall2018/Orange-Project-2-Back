@@ -1,0 +1,35 @@
+from db import db
+from datetime import datetime
+
+from models.basemodel import BaseModel
+from utils.jsonencode import JsonEncodedDict
+from tests.helper_tests import helper
+
+class GymShadowModel(db.Model, BaseModel):
+    __tablename__ = "gymshadow"
+
+    id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_updated = db.Column(db.DateTime)
+
+    name = db.Column(db.String(100))
+    phone = db.Column(db.String(200))
+    pic_url = db.Column(db.String(255))
+    schedule = db.Column(JsonEncodedDict)
+
+
+    def __init__(self, name, pic_url):
+        self.name = name
+        self.pic_url = pic_url
+        self.date_created = datetime.now()
+        self.date_updated = datetime.now()
+        
+    def json(self):
+        return {
+                "name": self.name,
+                "pic_url": self.pic_url,
+                "date_created": self.date_created.strftime("%Y-%m-%d %H:%M:%S"),
+                "date_updated": self.date_updated.strftime("%Y-%m-%d %H:%M:%S"),
+                "shadow_metadata": self.shadow_metadata,
+                "times": helper.ordered(self.schedule),
+                }

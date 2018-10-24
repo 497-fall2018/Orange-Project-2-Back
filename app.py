@@ -9,16 +9,16 @@ from flask_admin.contrib import sqla
 from flask_basicauth import BasicAuth
 from werkzeug.exceptions import HTTPException
 
-
+from views.GymView import GymView
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///localdata.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['BASIC_AUTH_USERNAME'] = 'orange'
-app.config['BASIC_AUTH_PASSWORD'] = 'orange'
+app.config['BASIC_AUTH_PASSWORD'] = 'oranges'
 migrate = Migrate(app, db)
 basic_auth = BasicAuth(app)
-admin = Admin(app, name='perf', template_mode='bootstrap3')
+admin = Admin(app, name='Orange', template_mode='bootstrap3')
 
 if __name__ == '__main__':
     CORS(app)
@@ -29,6 +29,14 @@ else:
 def hello_world():
     return "running!"
 
+@app.route('/v1/gyms', methods=['GET', 'POST'])
+def gym_info():
+    if request.method == 'GET':
+        return GymView.get_gym()
+    elif request.method == 'POST':
+        pass
+
+from models.GymShadowModel import GymShadowModel
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
@@ -47,6 +55,13 @@ class AuthException(HTTPException):
             {'WWW-Authenticate': 'Basic realm="Login Required"'}
         ))
 
+class GymShadowAdminView(ModelView):
+    column_list = ['id', 'name', 'phone', 'date_updated', 'schedule', 'date_created', 'pic_url']
+    column_searchable_list = ['name']
+    column_filters = ['id', 'name', 'date_updated', 'date_created']
+    column_default_sort = ('name', True)
+
+admin.add_view(GymShadowAdminView(GymShadowModel, db.session))
 
 if __name__ == '__main__':
     db.init_app(app)
