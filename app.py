@@ -16,6 +16,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['BASIC_AUTH_USERNAME'] = 'orange'
 app.config['BASIC_AUTH_PASSWORD'] = 'oranges'
+app.secret_key = 'super secret key'
+app.config['SESSION_TYPE'] = 'filesystem'
 migrate = Migrate(app, db)
 basic_auth = BasicAuth(app)
 admin = Admin(app, name='Orange', template_mode='bootstrap3')
@@ -34,7 +36,11 @@ def gym_info():
     if request.method == 'GET':
         return GymView.get_gym()
     elif request.method == 'POST':
-        pass
+        return GymView.make_gym()
+
+@app.route('/v1/update', methods=['POST'])
+def gym_update():
+    return GymView.make_stamp_scrape()
 
 from models.GymShadowModel import GymShadowModel
 

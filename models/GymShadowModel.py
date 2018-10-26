@@ -17,10 +17,10 @@ class GymShadowModel(db.Model, BaseModel):
     pic_url = db.Column(db.String(255))
     schedule = db.Column(JsonEncodedDict)
 
-
-    def __init__(self, name, pic_url):
+    def __init__(self, name, pic_url, phone):
         self.name = name
         self.pic_url = pic_url
+        self.phone = phone
         self.date_created = datetime.now()
         self.date_updated = datetime.now()
         
@@ -30,6 +30,10 @@ class GymShadowModel(db.Model, BaseModel):
                 "pic_url": self.pic_url,
                 "date_created": self.date_created.strftime("%Y-%m-%d %H:%M:%S"),
                 "date_updated": self.date_updated.strftime("%Y-%m-%d %H:%M:%S"),
-                "shadow_metadata": self.shadow_metadata,
-                "times": helper.ordered(self.schedule),
+                "schedule": self.schedule,
+                "phone": self.phone,
                 }
+
+    @classmethod
+    def find_by_name(cls, name):
+        return cls.query.filter_by(name=name).first()
