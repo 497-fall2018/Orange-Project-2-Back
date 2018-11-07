@@ -15,6 +15,7 @@ class GymShadowModel(db.Model, BaseModel):
     name = db.Column(db.String(100))
     phone = db.Column(db.String(200))
     pic_url = db.Column(db.String(255))
+    status = db.Column(db.String(200))
     schedule = db.Column(JsonEncodedDict)
 
     def __init__(self, name, pic_url, phone):
@@ -23,15 +24,18 @@ class GymShadowModel(db.Model, BaseModel):
         self.phone = phone
         self.date_created = datetime.now()
         self.date_updated = datetime.now()
+        self.status = ""
         
     def json(self):
         return {
+                "id": self.id,
                 "name": self.name,
                 "pic_url": self.pic_url,
                 "date_created": self.date_created.strftime("%Y-%m-%d %H:%M:%S"),
                 "date_updated": self.date_updated.strftime("%Y-%m-%d %H:%M:%S"),
                 "schedule": self.schedule,
                 "phone": self.phone,
+                "status": self.status,
                 }
 
     @classmethod

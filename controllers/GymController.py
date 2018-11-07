@@ -9,8 +9,19 @@ class GymController():
     logger = Logger(__name__)
 
     @classmethod
+    def call_gym(cls):
+        return '', 200, "calling gym"
+
+    @classmethod
     def get_all(cls):
-        return '', 200, GymShadowModel.get_all()
+        result = []
+        for each in GymShadowModel.get_all():
+            with_status = each.json()
+            if each.status == "" and each.schedule:
+                with_status['status'] = each.schedule[str(datetime.now().hour)]
+            result.append(with_status)
+
+        return '', 200, result
 
     @classmethod
     def make_gym(cls, data):

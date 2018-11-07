@@ -8,13 +8,21 @@ import json
 class GymView(MethodView):
 
     @classmethod
+    def call_gym(cls):
+        error_message, status, response = GymController.call_gym()
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dump({"response": response}), status
+
+    @classmethod
     def get_gym(cls):
         error_message, status, response = GymController.get_all()
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
 
-        return json.dumps({"response": list(map(lambda x : x.json() if x else None, response))}), status
+        return json.dumps({"response": response}), status
 
     @classmethod
     def make_gym(cls):
