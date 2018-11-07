@@ -13,7 +13,7 @@ class GymView(MethodView):
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
-        return json.dump({"response": response}), status
+        return json.dumps({"response": response}), status
 
     @classmethod
     def get_gym(cls):

@@ -38,13 +38,12 @@ def gym_info():
     elif request.method == 'POST':
         return GymView.make_gym()
 
-@app.route('/v1/update', methods=['POST'])
+@app.route('/v1/update', methods=['GET', 'POST'])
 def gym_update():
-    return GymView.call_gym()
-
-@app.route('/v1/update/scrape', methods=['POST'])
-def gym_update_scrape():
-    return GymView.make_stamp_scrape()
+    if request.method == 'GET':
+        return GymView.call_gym()
+    elif request.method == 'POST':
+        return GymView.make_stamp_scrape()
 
 from models.GymShadowModel import GymShadowModel
 
