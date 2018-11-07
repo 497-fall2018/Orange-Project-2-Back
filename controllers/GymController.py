@@ -5,12 +5,43 @@ from models.GymStampModel import GymStampModel
 
 from utils.logger import Logger
 
+import twilio
+
+from twilio.twiml.voice_response import Gather, VoiceResponse, Say
+
+
 class GymController():
     logger = Logger(__name__)
 
     @classmethod
     def call_gym(cls):
+
+        from twilio.rest import Client
+
+        # Your Account Sid and Auth Token from twilio.com/user/account
+        account_sid = "AC001d428747f459acf98d736285ac1ba9"
+        auth_token = "d61a7a610d338e673f0333b556fc4f63"
+        client = Client(account_sid, auth_token)
+
+        call = client.calls.create(
+            to="+19143744449",
+            from_="+16317063866",
+            url="http://b41cb660.ngrok.io/v1/twilio/xml"
+        )
+
         return '', 200, "calling gym"
+
+
+    @classmethod
+    def retrieve_xml(cls):
+
+        response = VoiceResponse()
+        gather = Gather(action='/v1/twilio/gather', method='POST', finishOnKey="#", input="dtmf")
+        gather.say("Hello. This is Courts and Shorts. Please press 1 if courts are currntly open, 2 if full, and 3 if you want some ice cream")
+        response.append(gather)
+        response.say('We didn\'t receive any input. Goodbye!')
+
+        return '', 200, str(response)
 
     @classmethod
     def get_all(cls):

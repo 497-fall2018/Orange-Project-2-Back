@@ -38,12 +38,27 @@ def gym_info():
     elif request.method == 'POST':
         return GymView.make_gym()
 
+
 @app.route('/v1/update', methods=['GET', 'POST'])
 def gym_update():
     if request.method == 'GET':
         return GymView.call_gym()
     elif request.method == 'POST':
         return GymView.make_stamp_scrape()
+
+
+@app.route('/v1/twilio/xml', methods=['POST'])
+def get_xml():
+    if request.method == 'POST':
+        return GymView.retrieve_xml()
+
+
+@app.route('/v1/twilio/gather', methods=['POST'])
+def post_call_data():
+    if request.method == 'POST':
+        print(request.data)
+        return GymView.post_call_data()
+
 
 from models.GymShadowModel import GymShadowModel
 

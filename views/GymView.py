@@ -16,6 +16,21 @@ class GymView(MethodView):
         return json.dumps({"response": response}), status
 
     @classmethod
+    def retrieve_xml(cls):
+        error_message, status, response = GymController.retrieve_xml()
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+
+        return response
+        #return json.dumps({"response": response}), status
+
+    @classmethod
+    def post_call_data(cls):
+
+        return
+
+    @classmethod
     def get_gym(cls):
         error_message, status, response = GymController.get_all()
 
