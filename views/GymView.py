@@ -8,13 +8,41 @@ import json
 class GymView(MethodView):
 
     @classmethod
+    def call_gym(cls, name):
+        error_message, status, response = GymController.call_gym(name)
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dumps({"response": response}), status
+
+    @classmethod
+    def retrieve_xml(cls, name):
+        error_message, status, response = GymController.retrieve_xml(name)
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+
+        return response
+        #return json.dumps({"response": response}), status
+
+    @classmethod
+    def post_call_data(cls, name):
+        user_response = request.values.get("Digits")
+        if user_response:
+            GymController.update_gym_status(name, user_response)
+
+        error_message, status, response = GymController.thank_you_xml()
+
+        return response
+
+    @classmethod
     def get_gym(cls):
         error_message, status, response = GymController.get_all()
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
 
-        return json.dumps({"response": list(map(lambda x : x.json() if x else None, response))}), status
+        return json.dumps({"response": response}), status
 
     @classmethod
     def make_gym(cls):
