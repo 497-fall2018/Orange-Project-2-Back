@@ -23,6 +23,7 @@ class GymController():
         call = client.calls.create(
             to="+19143744449",
             from_="+16317063866",
+            #NGROK URL
             url= "http://8695907d.ngrok.io" + "/v1/twilio/xml/" + name
         )
 
