@@ -5,18 +5,15 @@ from models.GymStampModel import GymStampModel
 
 from utils.logger import Logger
 
-import twilio
-
 from twilio.twiml.voice_response import Gather, VoiceResponse, Say
-
+from twilio.rest import Client
 
 class GymController():
     logger = Logger(__name__)
 
     @classmethod
-    def call_gym(cls):
+    def call_gym(cls, name):
 
-        from twilio.rest import Client
 
         # Your Account Sid and Auth Token from twilio.com/user/account
         account_sid = "AC001d428747f459acf98d736285ac1ba9"
@@ -26,22 +23,55 @@ class GymController():
         call = client.calls.create(
             to="+19143744449",
             from_="+16317063866",
-            url="http://b41cb660.ngrok.io/v1/twilio/xml"
+            url= "http://8695907d.ngrok.io" + "/v1/twilio/xml/" + name
         )
 
         return '', 200, "calling gym"
 
 
     @classmethod
-    def retrieve_xml(cls):
+    def retrieve_xml(cls, name):
 
         response = VoiceResponse()
-        gather = Gather(action='/v1/twilio/gather', method='POST', finishOnKey="#", input="dtmf")
-        gather.say("Hello. This is Courts and Shorts. Please press 1 if courts are currntly open, 2 if full, and 3 if you want some ice cream")
+        gather = Gather(action='/v1/twilio/gather/' + name, method='POST', finishOnKey="#", input="dtmf")
+        gather.say("Hello. This is Courts and Shorts. Please press 1 if courts are empty, 2 if semi-full, and 3 if full")
         response.append(gather)
         response.say('We didn\'t receive any input. Goodbye!')
 
         return '', 200, str(response)
+
+    @classmethod
+    def thank_you_xml(cls):
+        response = VoiceResponse()
+        response.say('Thank you, and have a nice day!')
+
+        return '', 200, str(response)
+
+    @classmethod
+    def update_gym_status(cls, name, user_response):
+
+        # check if the gym's name is valid
+        try:
+            target = GymShadowModel.find_by_name(name)
+        except:
+            cls.logger.exception("Error fetching a gym model")
+
+        if not target:
+            cls.logger.exception("Attempted to update a gym without that name")
+
+        if user_response == "1":
+            status_string = "Empty"
+        elif user_response == "2":
+            status_string = "Semi-full"
+        elif user_response == "3":
+            status_string = "Full"
+        else:
+            cls.logger.exception(f"Unexpected user response: {user_response}")
+            status_string = "Unknown"
+
+        target.status = status_string
+        target.save_to_db()
+
 
     @classmethod
     def get_all(cls):
