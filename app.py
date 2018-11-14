@@ -31,13 +31,17 @@ else:
 def hello_world():
     return "running!"
 
+@app.route('/v1/subscribe', methods=['POST'])
+def make_job():
+    if request.method == 'POST':
+        return GymView.make_job()
+
 @app.route('/v1/gyms', methods=['GET', 'POST'])
 def gym_info():
     if request.method == 'GET':
         return GymView.get_gym()
     elif request.method == 'POST':
         return GymView.make_gym()
-
 
 @app.route('/v1/update/<string:name>', methods=['GET', 'POST'])
 def gym_update(name):
@@ -60,6 +64,7 @@ def post_call_data(name):
 
 
 from models.GymShadowModel import GymShadowModel
+from models.JobModel import JobModel
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
@@ -84,7 +89,15 @@ class GymShadowAdminView(ModelView):
     column_filters = ['id', 'name', 'date_updated', 'date_created']
     column_default_sort = ('name', True)
 
+
+class JobAdminView(ModelView):
+    column_list = ['id', 'name', 'phone', 'date_created']
+    column_searchable_list = ['name']
+    column_filters = ['id', 'name', 'date_created']
+    column_default_sort = ('name', True)
+
 admin.add_view(GymShadowAdminView(GymShadowModel, db.session))
+admin.add_view(JobAdminView(JobModel, db.session))
 
 if __name__ == '__main__':
     db.init_app(app)
