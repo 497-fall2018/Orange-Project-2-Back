@@ -22,7 +22,7 @@ class GymController():
         client = Client(account_sid, auth_token)
 
         call = client.calls.create(
-            to="+19143744449",
+            to="+12033219249",
             from_="+16317063866",
             #NGROK URL
             url= "http://8d8c914a.ngrok.io" + "/v1/twilio/xml/" + name
