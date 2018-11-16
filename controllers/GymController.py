@@ -19,9 +19,9 @@ class GymController():
         client = Client(account_sid, auth_token)
 
         call = client.calls.create(
-            to="+19143744449",
+            to="+18476442474",
             from_="+16317063866",
-            url= "http://8695907d.ngrok.io" + "/v1/twilio/xml/" + name
+            url= "http://ec2-52-12-208-85.us-west-2.compute.amazonaws.com" + "/v1/twilio/xml/" + name
         )
 
         return '', 200, "calling gym"
