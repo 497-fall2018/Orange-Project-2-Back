@@ -10,5 +10,5 @@ def send_notification(phone_num, name, status):
     message = client.messages.create(
         from_='+16317063866',
         body='Hello! Courts at ' + name + ' is now ' + status,
-        to='+' + phone_num
+        to='+1' + phone_num
     )

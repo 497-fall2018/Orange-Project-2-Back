@@ -60,25 +60,33 @@ class GymController():
             cls.logger.exception("Error fetching a gym model")
         
         if target:
-            status_dict = {"1":"Empty",
-                        "2": "Semi-full",
-                        "3": "Full"}
+            status_dict = {
+                    "Available": 0,
+                    "Empty": 1,
+                    "Semi-full": 2,
+                    "Full": 3,
+                    "Closed": 4,
+                    }
+            num_to_status = {
+                    0: "Available",
+                    1: "Empty",
+                    2: "Semi-full",
+                    3: "Full",
+                    4: "Closed",
+                    }
 
-            status_string = status_dict.get(user_response)
-
-            if not status_string:
+            if user_response not in ["0", "1", "2", "3", "4"]:
                 cls.logger.exception(f"Unexpected user response: {user_response}")
                 status_string = "Unknown"
 
-            if target.status == 'Full' and status_string == 'Empty':
-                for each in JobModel.get_all():
-                    send_notification(each.phone, target.name)
-                    JobModel.delete_from_db(each)
+            status_string = num_to_status[int(user_response)]
 
-            elif target.status == 'Full' and status_string == 'Semi-full':
+            if status_dict[target.status] - int(user_response) > 0:
                 for each in JobModel.get_all():
                     send_notification(each.phone, target.name, status_string)
                     JobModel.delete_from_db(each)
+            else:
+                print("No texting")
 
             target.status = status_string
             target.date_updated = datetime.now()
@@ -115,8 +123,13 @@ class GymController():
         try:
             gym_name = data['gym_name']
             phone_num = data['phone_number']
+            should_add = True
+            subscribed_to_gym = JobModel.find_by_name(gym_name)
+            for each in subscribed_to_gym:
+                if each.phone_num == phone_num:
+                    should_add = False
 
-            if not JobModel.find_by_name(gym_name) and not JobModel.find_by_phone_num(phone_num):
+            if should_add: 
                 new_job = JobModel(gym_name, phone_num)
                 new_job.save_to_db()
 

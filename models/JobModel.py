@@ -31,8 +31,5 @@ class JobModel(db.Model, BaseModel):
 
     @classmethod
     def find_by_name(cls, name):
-        return cls.query.filter_by(name=name).first()
+        return cls.query.filter_by(name=name).all()
 
-    @classmethod
-    def find_by_phone_num(cls, phone_num):
-        return cls.query.filter_by(phone=phone_num).first()
