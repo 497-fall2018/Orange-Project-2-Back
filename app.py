@@ -25,7 +25,7 @@ admin = Admin(app, name='Orange', template_mode='bootstrap3')
 if __name__ == '__main__':
     CORS(app)
 else:
-    CORS(app, resources={r"/*": {"origins": ["front"]}})
+    CORS(app)
 
 @app.route('/')
 def hello_world():
