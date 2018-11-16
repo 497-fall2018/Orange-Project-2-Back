@@ -2,8 +2,13 @@ from datetime import datetime
 
 from models.GymShadowModel import GymShadowModel 
 from models.GymStampModel import GymStampModel
+from models.JobModel import JobModel
 
 from utils.logger import Logger
+from utils.twilio import send_notification
+
+from twilio.twiml.voice_response import Gather, VoiceResponse, Say
+from twilio.rest import Client
 
 from twilio.twiml.voice_response import Gather, VoiceResponse, Say
 from twilio.rest import Client
@@ -53,24 +58,33 @@ class GymController():
             target = GymShadowModel.find_by_name(name)
         except:
             cls.logger.exception("Error fetching a gym model")
+        
+        if target:
+            status_dict = {"1":"Empty",
+                        "2": "Semi-full",
+                        "3": "Full"}
 
-        if target: 
-            if user_response == "1":
-                status_string = "Empty"
-            elif user_response == "2":
-                status_string = "Semi-full"
-            elif user_response == "3":
-                status_string = "Full"
-            else:
+            status_string = status_dict.get(user_response)
+
+            if not status_string:
                 cls.logger.exception(f"Unexpected user response: {user_response}")
                 status_string = "Unknown"
+
+            if target.status == 'Full' and status_string == 'Empty':
+                for each in JobModel.get_all():
+                    send_notification(each.phone, target.name)
+                    JobModel.delete_from_db(each)
+
+            elif target.status == 'Full' and status_string == 'Semi-full':
+                for each in JobModel.get_all():
+                    send_notification(each.phone, target.name, status_string)
+                    JobModel.delete_from_db(each)
 
             target.status = status_string
             target.date_updated = datetime.now()
             target.save_to_db()
         else:
             cls.logger.exception("Attempted to update a gym without that name")
-
 
     @classmethod
     def get_all(cls):
@@ -93,6 +107,21 @@ class GymController():
             new_gym.save_to_db()
         except:
             cls.logger.exception("Error creating a gym model")
+            return 'Internal Server Error', 500
+        return '', 201
+
+    @classmethod
+    def make_job(cls, data):
+        try:
+            gym_name = data['gym_name']
+            phone_num = data['phone_number']
+
+            if not JobModel.find_by_name(gym_name) and not JobModel.find_by_phone_num(phone_num):
+                new_job = JobModel(gym_name, phone_num)
+                new_job.save_to_db()
+
+        except:
+            cls.logger.exception("Error creating a job")
             return 'Internal Server Error', 500
         return '', 201
 
