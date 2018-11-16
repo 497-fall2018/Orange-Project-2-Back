@@ -13,8 +13,6 @@ class GymController():
 
     @classmethod
     def call_gym(cls, name):
-
-
         # Your Account Sid and Auth Token from twilio.com/user/account
         account_sid = "AC001d428747f459acf98d736285ac1ba9"
         auth_token = "d61a7a610d338e673f0333b556fc4f63"
@@ -79,7 +77,10 @@ class GymController():
         for each in GymShadowModel.get_all():
             with_status = each.json()
             if each.status == "" and each.schedule:
-                with_status['status'] = each.schedule[str(datetime.now().hour)]
+                try:
+                    with_status['status'] = each.schedule[str(datetime.now().hour)]
+                except:
+                    with_status['status'] = "Closed"
             result.append(with_status)
 
         return '', 200, result
