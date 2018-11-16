@@ -82,7 +82,7 @@ class GymController():
             status_string = num_to_status[int(user_response)]
 
             if status_dict[target.status] - int(user_response) > 0:
-                for each in JobModel.get_all():
+                for each in JobModel.find_by_name(target.name):
                     send_notification(each.phone, target.name, status_string)
                     JobModel.delete_from_db(each)
             else:
