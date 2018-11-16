@@ -54,21 +54,22 @@ class GymController():
         except:
             cls.logger.exception("Error fetching a gym model")
 
-        if not target:
-            cls.logger.exception("Attempted to update a gym without that name")
+        if target: 
+            if user_response == "1":
+                status_string = "Empty"
+            elif user_response == "2":
+                status_string = "Semi-full"
+            elif user_response == "3":
+                status_string = "Full"
+            else:
+                cls.logger.exception(f"Unexpected user response: {user_response}")
+                status_string = "Unknown"
 
-        if user_response == "1":
-            status_string = "Empty"
-        elif user_response == "2":
-            status_string = "Semi-full"
-        elif user_response == "3":
-            status_string = "Full"
+            target.status = status_string
+            target.date_updated = datetime.now()
+            target.save_to_db()
         else:
-            cls.logger.exception(f"Unexpected user response: {user_response}")
-            status_string = "Unknown"
-
-        target.status = status_string
-        target.save_to_db()
+            cls.logger.exception("Attempted to update a gym without that name")
 
 
     @classmethod
